@@ -1,0 +1,56 @@
+{{define "index"}}
+<html lang="en">
+
+<head>
+    {{template "head" .}}
+</head>
+
+<body class="bg-inverse">
+    {{template "navbar" .}}
+    <div class="container-fluid bg-inverse text-white">
+        <table class="table table-hover table-inverse" style="cursor:pointer">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Author</th>
+                    <th>Year</th>
+                    <th>ID</th>
+                </tr>
+            </thead>
+            <tbody id="search-results">
+            </tbody>
+        </table>
+    </div>
+    {{template "bodyIncludes" .}}
+    <script type="text/javascript">
+    function submitSearch() {
+        $.ajax({
+            url: "/search",
+            method: "POST",
+            data: $("#search-form").serialize(),            
+            success: function (rawData) {
+                var parsed = JSON.parse(rawData);
+                if (!parsed) return;
+
+                var searchResults = $("#search-results");
+                searchResults.empty();
+
+                parsed.forEach(function (result) {
+                    var row = $("<tr><td>" + result.Title + "</td><td>" + result.Author + "</td><td>" + result.Year + "</td><td>" + result.ID + "</td></tr>");
+                    searchResults.append(row);
+                    row.on('click', function(){
+                        $.ajax({
+                            url:"/books/add?id="+result.ID,
+                            method:"GET"
+                        })
+                    })
+                })
+            }
+        });
+        return false;
+    }
+</script>
+</body>
+
+</html>
+{{end}}

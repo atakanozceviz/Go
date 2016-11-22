@@ -1,0 +1,14 @@
+{{define "navbar"}}
+<nav class="navbar navbar-dark bg-inverse">
+    <a class="navbar-brand" href="/">Gophr</a>
+    <ul class="nav navbar-nav">
+        <li class="nav-item">
+            <a class="nav-link {{if eq .Active " register " }}active{{end}}" href="/register">Register</a>
+        </li>
+    </ul>
+    <form id="search-form" onsubmit="return false" class="form-inline float-xs-right">
+        <input class="form-control" type="text" placeholder="Search" name="search" value="" />
+        <input class="btn btn-outline-success" type="submit" onclick="submitSearch()" value="Search" />
+    </form>
+</nav>
+{{end}}

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Ödev-1">
+<meta name="author" content="Atakan Özceviz">
+<title>JSON</title>
+<link href="css/bootstrap.min.css" rel="stylesheet">
+<link href="css/main.css" rel="stylesheet">
+</head>
+
+<body>
+<nav class="navbar navbar-inverse navbar-static-top">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar"> <span class="sr-only">Toggle navigation</span> <span class="icon-bar"></span> <span class="icon-bar"></span> <span class="icon-bar"></span> </button>
+      <a class="navbar-brand" href="#">Ödev-1</a> </div>
+    <div id="navbar" class="collapse navbar-collapse">
+      <ul class="nav navbar-nav">
+        <li><a href="index.html">Kişisel Bilgiler</a></li>
+        <li><a href="cmf.xml">Öğrenci Bilgileri</a></li>
+        <li class="active"><a href="json.html">JSON</a></li>
+        <li><a href="form.html">Form</a></li>
+      </ul>
+    </div>
+    <!--/.nav-collapse --> 
+  </div>
+</nav>
+<div class="container-fluid">
+  <table class="table table-hover">
+    <thead>
+      <tr>
+        <th style="width: 1%">#</th>
+        <th>Cinsiyet</th>
+        <th>Ad</th>
+        <th>Soyad</th>
+        <th>Email</th>
+        <th>Ülke</th>
+        <th>Resim</th>
+        <th>Okul</th>
+        <th>Bolum</th>
+        <th>Renk Tercihi</th>
+      </tr>
+    </thead>
+    <tbody id="target">
+    </tbody>
+  </table>
+</div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script> 
+<script src="js/bootstrap.min.js"></script> 
+<script>
+    $(document).ready(function() {
+     $.getJSON('veri.json', function(obj) {
+      for (var i = 0; i < obj.calisanlar.length; i++) {
+       if (obj.calisanlar[i].cinsiyet == "Male") {
+        var tr = "<tr><td>" + obj.calisanlar[i].id + "</td><td bgcolor='#B0E0E6'>" + obj.calisanlar[i].cinsiyet + "</td><td>" + obj.calisanlar[i].ad + "</td><td>" + obj.calisanlar[i].soyad + "</td><td>" + obj.calisanlar[i].email + "</td><td>" + obj.calisanlar[i].ulke + "</td><td><img src=" + obj.calisanlar[i].foto + "</td><td>" + obj.calisanlar[i].okul + "</td><td>" + obj.calisanlar[i].bolum + "</td><td>" + obj.calisanlar[i].renk_tercihi + "</td></tr>";
+       } else {
+        var tr = "<tr><td>" + obj.calisanlar[i].id + "</td><td bgcolor='#FFC0CB'>" + obj.calisanlar[i].cinsiyet + "</td><td>" + obj.calisanlar[i].ad + "</td><td>" + obj.calisanlar[i].soyad + "</td><td>" + obj.calisanlar[i].email + "</td><td>" + obj.calisanlar[i].ulke + "</td><td><img src=" + obj.calisanlar[i].foto + "</td><td>" + obj.calisanlar[i].okul + "</td><td>" + obj.calisanlar[i].bolum + "</td><td>" + obj.calisanlar[i].renk_tercihi + "</td></tr>";
+       }
+       $("#target").append(
+        tr
+       )
+      }
+     });
+    });
+</script>
+</body>
+</html>
