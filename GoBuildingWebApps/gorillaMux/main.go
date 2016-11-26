@@ -9,16 +9,12 @@ import (
 	"github.com/gorilla/mux"
 )
 
-const (
-	Port = ":80"
-)
-
 func main() {
 	rtr := mux.NewRouter()
 	rtr.HandleFunc("/pages/{id:[0-9]+}", pageHandler)
 	rtr.HandleFunc("/{id:.+}", pageHandler)
 	http.Handle("/", rtr)
-	http.ListenAndServe(Port, nil)
+	http.ListenAndServe(":80", nil)
 
 }
 

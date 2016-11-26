@@ -1,0 +1,52 @@
+{{define "index"}}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    {{template "head" .}}
+</head>
+
+<body>
+    {{template "navbar" .}}
+    <div class="container-fluid">
+        <table id="tbl" class="table table-striped table-bordered" cellspacing="0" width="100%">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Name</th>
+                    <th>Age</th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+    {{template "bodyIncludes" .}}
+    <script>
+        $(document).ready(function() {
+            $('#tbl').DataTable({
+                dom: 'Bfrtip',
+                buttons: [
+                    'copy', 'excel', 'pdf'
+                ],
+                responsive: true,
+                "ajax": {
+                    "url": "/table/list",
+                    "type": "POST",
+                    "dataSrc": function(json) {
+                        var parsed = JSON.parse(json);
+                        return parsed;
+                    }
+                },
+                "columns": [{
+                    "data": "id"
+                }, {
+                    "data": "name"
+                }, {
+                    "data": "age"
+                }]
+            });
+        });
+    </script>
+</body>
+
+</html>
+{{end}}

@@ -1,0 +1,91 @@
+{{define "index"}}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    {{template "head" .}}
+</head>
+
+<body>
+    {{template "navbar" .}}
+    <div class="container-fluid">
+        <table id="tbl" class="table table-striped table-bordered" cellspacing="0" width="100%">
+
+        </table>
+    </div>
+    {{template "bodyIncludes" .}}
+    <script>
+        $(document).ready(function () {
+
+            //Prepare jTable
+            $('#tbl').jtable({
+                title: 'Üyeler',
+                paging: true,
+                pageSize: 10,
+                sorting: true,
+                defaultSorting: 'adsoyad ASC',
+                actions: {
+                    listAction: '/table/list',
+                    createAction: '/table/create',
+                    updateAction: '/table/update',
+                    deleteAction: '/table/delete'
+                },
+                fields: {
+                    id: {
+                        key: true,
+                        create: false,
+                        edit: false,
+                        list: false
+                    },
+                    adsoyad: {
+                        title: 'Ad Soyad',
+                        width: '25%',
+                        inputClass: 'validate[required]'
+                    },
+
+                    kullaniciadi: {
+                        title: 'Kullanıcı Adı',
+                        list: false
+                    },
+                    sifre: {
+                        title: 'Şifre',
+                        list: false,
+                        type: "password"
+                    },
+
+                    telefon: {
+                        title: 'Telefon',
+                        width: '25%',
+                        inputClass: 'validate[custom[phone]]'
+                    },
+                    adres: {
+                        title: 'Adres',
+                        width: '50%',
+                        type: "textarea",
+                        inputClass: 'validate[required]'
+                    }
+                },
+                //Initialize validation logic when a form is created
+                formCreated: function (event, data) {
+                    data.form.validationEngine();
+                },
+                //Validate form when it is being submitted
+                formSubmitting: function (event, data) {
+                    return data.form.validationEngine('validate');
+                },
+                //Dispose validation logic when form is closed
+                formClosed: function (event, data) {
+                    data.form.validationEngine('hide');
+                    data.form.validationEngine('detach');
+                }
+            });
+
+            //Load person list from server
+            $('#tbl').jtable('load');
+
+        });
+    </script>
+</body>
+
+</html>
+{{end}}
