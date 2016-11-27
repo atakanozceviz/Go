@@ -30,6 +30,7 @@ func main() {
 	router.NotFound = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "public/404.html")
 	})
+
 	router.ServeFiles("/public/*filepath", http.Dir("public/"))
 	log.Fatal(http.ListenAndServe(":80", router))
 }
