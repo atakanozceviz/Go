@@ -12,6 +12,7 @@ import (
 
 	"github.com/julienschmidt/httprouter"
 	_ "github.com/mattn/go-sqlite3"
+	"strconv"
 )
 
 // compile all templates and cache them
@@ -27,9 +28,13 @@ func main() {
 	router.GET("/", indexHandler)
 	router.POST("/table/:name", tableActions)
 
+	router.GET("/table/:name", func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+		http.ServeFile(w, r, "public/404.html")
+	})
 	router.NotFound = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "public/404.html")
 	})
+
 	router.ServeFiles("/public/*filepath", http.Dir("public/"))
 	log.Fatal(http.ListenAndServe(":80", router))
 }
@@ -86,13 +91,34 @@ func tableActions(w http.ResponseWriter, r *http.Request, ps httprouter.Params) 
 	} else if ps.ByName("name") == "edit" {
 		id := r.FormValue("id")
 		name := r.FormValue("name")
-		age := r.FormValue("age")
-		fmt.Println(id, name, age)
+		age, _ := strconv.Atoi(r.FormValue("age"))
 		_, err := db.Exec("UPDATE person SET name = ?, age = ? WHERE id = ?", name, age, id)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			log.Println(err)
 			return
 		}
+		w.Write([]byte("OK"))
+
+	} else if ps.ByName("name") == "delete" {
+		id := r.FormValue("id")
+		_, err := db.Exec("DELETE FROM person WHERE id = ?", id)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			log.Println(err)
+			return
+		}
+		w.Write([]byte("OK"))
+
+	} else if ps.ByName("name") == "add" {
+		age, _ := strconv.Atoi(r.FormValue("age"))
+		name := r.FormValue("name")
+		_, err := db.Exec("INSERT INTO person( age, name, id) VALUES ( ? , ? , ? );", age, name, nil)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			log.Println(err)
+			return
+		}
+		w.Write([]byte("OK"))
 	}
 }
