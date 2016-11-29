@@ -39,12 +39,16 @@ func main() {
 	log.Fatal(http.ListenAndServe(":80", router))
 }
 
-func indexHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+type pageData struct {
+	Title string
+}
 
+func indexHandler(w http.ResponseWriter, _ *http.Request, _ httprouter.Params) {
+	title := pageData{Title: "DataTables Example"}
 	clone, _ := templates.Clone()
 
 	// you access the cached templates with the defined name, not the filename
-	err := clone.ExecuteTemplate(w, "index", nil)
+	err := clone.ExecuteTemplate(w, "index", title)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		log.Println(err)

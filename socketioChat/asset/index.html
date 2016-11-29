@@ -1,0 +1,113 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="chat.css">
+    <title>Chat</title>
+</head>
+<body>
+
+<div class="col-xs-12">
+    <div class="panel">
+        <!--Heading-->
+        <div class="panel-heading">
+            <div class="panel-control">
+                <div class="btn-group">
+                    <button class="btn btn-default" type="button" data-toggle="collapse"
+                            data-target="#chat-body"><i class="fa fa-chevron-down"></i></button>
+                </div>
+            </div>
+            <h3 class="panel-title">Chat</h3>
+        </div>
+
+        <!--Widget body-->
+        <div id="chat-body" class="collapse in">
+            <div class="nano has-scrollbar" style="height:380px">
+                <div class="nano-content pad-all" tabindex="0">
+                    <ul class="list-unstyled media-block" id="messages">
+
+                    </ul>
+                </div>
+            </div>
+
+            <!--Widget footer-->
+            <div class="panel-footer">
+                <div class="row">
+                    <form action="">
+                        <div class="col-xs-9">
+                            <input id="m" autocomplete="off" type="text" placeholder="Enter your text"
+                                   class="form-control chat-input">
+                        </div>
+                        <div class="col-xs-3">
+                            <button class="btn btn-primary btn-block" type="submit">Send</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
+<script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootbox.js/4.4.0/bootbox.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script>
+    var socket = io();
+    var conversation_id;
+
+    function subscribe() {
+        socket.emit('subscribe', conversation_id);
+    }
+
+    $('form').submit(function () {
+        socket.emit('send message', {
+            room: conversation_id,
+            message: "Customer: " + $('#m').val()
+        });
+        $('#messages').append(' <li class="mar-btm"> <div class="media-right"> <img src="http://bootdey.com/img/Content/avatar/avatar2.png" class="img-circle img-sm" alt="Profile Picture"> </div><div class="media-body pad-hor speech-right"> <div class="speech"> <a href="#" class="media-heading">Customer</a> <p>' + $('#m').val() + '</p></div></div></li>');
+        $('#m').val('');
+        $(".nano-content").scrollTop($(".nano-content")[0].scrollHeight);
+        return false;
+    });
+
+    socket.on('conversation private post', function (msg) {
+        $('#messages').append('<li class="mar-btm"> <div class="media-left"> <img src="http://bootdey.com/img/Content/avatar/avatar1.png" class="img-circle img-sm" alt="Profile Picture"> </div><div class="media-body pad-hor"> <div class="speech"> <a href="#" class="media-heading">Admin</a> <p>' + msg + '</p></div></div>');
+        $(".nano-content").scrollTop($(".nano-content")[0].scrollHeight);
+    });
+
+
+    function askEmail() {
+        bootbox.prompt({
+            title: "Enter email",
+            inputType: 'email',
+            callback: function (result) {
+                if (result) {
+                    $.ajax({
+                        type: "POST",
+                        url: "/lookup",
+                        data: {email: result},
+                        success: function (res) {
+                            if (res > 0) {
+                                conversation_id = res;
+                                subscribe();
+
+                            } else {
+                                askEmail()
+                            }
+                        }
+                    });
+                }
+            }
+        })
+    }
+    $(document).ready(function () {
+        askEmail()
+    })
+</script>
+</body>
+</html>
