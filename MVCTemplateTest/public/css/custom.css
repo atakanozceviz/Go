@@ -1,8 +1,0 @@
-.ellipis {
-    overflow: hidden;
-    -ms-text-overflow: ellipsis;
-    -o-text-overflow: ellipsis;
-    text-overflow: ellipsis;
-    display: block;
-    white-space: nowrap;
-}

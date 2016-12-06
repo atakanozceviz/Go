@@ -1,25 +1,22 @@
 {{define "user"}}
-<div class="col-xs-12 col-sm-6 col-md-4 col-lg-2">
+<div class="col-xs-12 col-sm-6 col-md-4 col-lg-3">
     <table class="table table-bordered table-inverse">
         <tbody>
         <tr>
-            <td colspan="2">
-                <img src="{{.ImgURL}}" class="rounded img-fluid" alt="Robot">
+            <td colspan="2" align="center">
+                <img src="{{.ImgURL}}" class="img-fluid image" alt="Robot">
             </td>
         </tr>
         <tr>
-            <td>Name:</td>
-            <td>{{.Name}}</td>
+            <td data-toggle="tooltip" data-placement="bottom" title="Name">{{.Name}}</td>
         </tr>
         <tr>
-            <td>Address:</td>
-            <td class="ellipis">
+            <td data-toggle="tooltip" data-placement="bottom" title="Address">
                 {{.Address}}
             </td>
         </tr>
         <tr>
-            <td>Age:</td>
-            <td>{{.Age}}</td>
+            <td data-toggle="tooltip" data-placement="bottom" title="Age">{{.Age}}</td>
         </tr>
         </tbody>
     </table>
