@@ -5,24 +5,18 @@ import (
 	"log"
 	"net/http"
 
-	"database/sql"
-	"fmt"
-
 	"encoding/json"
 
 	"github.com/julienschmidt/httprouter"
-	_ "github.com/mattn/go-sqlite3"
+
+	"github.com/revel/modules/db/app"
 	"strconv"
 )
 
 // compile all templates and cache them
 var templates = template.Must(template.ParseGlob("templates/*"))
 
-var db, _ = sql.Open("sqlite3", "db.db")
-
 func main() {
-
-	fmt.Println(db.Ping())
 
 	router := httprouter.New()
 	router.GET("/", indexHandler)

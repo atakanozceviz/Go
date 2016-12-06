@@ -6,9 +6,13 @@ import (
 	"net/http"
 
 	"encoding/json"
+
 	"github.com/googollee/go-socket.io"
+	"github.com/julienschmidt/httprouter"
 	_ "github.com/mattn/go-sqlite3"
 )
+
+const PORT = ":8080"
 
 var db, _ = sql.Open("sqlite3", "users.db")
 var onlineUsers = make(map[string]string)
@@ -32,6 +36,7 @@ func main() {
 			room := data["room"]
 			if room != "admin" {
 				so.BroadcastTo("admin", "ToAdmin", data)
+				log.Println(data)
 			}
 
 			so.BroadcastTo(room, "conversation private post", msg)
@@ -54,28 +59,36 @@ func main() {
 		})
 
 		so.On("disconnection", func() {
+			room := onlineUsers[so.Id()]
 			delete(onlineUsers, so.Id())
-			so.BroadcastTo("admin", "ToAdmin", "refresh")
+			so.BroadcastTo("admin", "ToAdmin", `{"delete": "delete", "room": `+room+`}`)
 		})
 	})
 	server.On("error", func(so socketio.Socket, err error) {
 		log.Println("error:", err)
 	})
 
-	http.Handle("/socket.io/", server)
-	http.Handle("/", http.FileServer(http.Dir("./asset")))
-	http.HandleFunc("/admin", serveStatic)
-	http.HandleFunc("/lookup", lookup)
-	http.HandleFunc("/whoisOnline", whoisOnline)
-	log.Println("Serving at localhost:80...")
-	log.Fatal(http.ListenAndServe(":80", nil))
+	rtr := httprouter.New()
+
+	rtr.Handler(http.MethodGet, "/socket.io/", server)
+	rtr.Handler(http.MethodPost, "/socket.io/", server)
+	rtr.GET("/", indexHandler)
+	rtr.GET("/admin", adminHandler)
+	rtr.POST("/lookup", lookup)
+	rtr.POST("/whoisOnline", whoisOnline)
+	rtr.ServeFiles("/asset/*filepath", http.Dir("asset/"))
+
+	log.Println("Serving at localhost: " + PORT)
+	log.Fatal(http.ListenAndServe(PORT, rtr))
 }
 
-func serveStatic(w http.ResponseWriter, r *http.Request) {
+func adminHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	http.ServeFile(w, r, "asset/admin.html")
 }
-
-func lookup(w http.ResponseWriter, r *http.Request) {
+func indexHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	http.ServeFile(w, r, "asset/index.html")
+}
+func lookup(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	email := r.FormValue("email")
 
 	rows, err := db.Query("SELECT id FROM user WHERE email = ? ", email)
@@ -99,7 +112,7 @@ func lookup(w http.ResponseWriter, r *http.Request) {
 
 	w.Write([]byte(id))
 }
-func whoisOnline(w http.ResponseWriter, r *http.Request) {
+func whoisOnline(w http.ResponseWriter, _ *http.Request, _ httprouter.Params) {
 
 	type idEmail struct {
 		ID    string `json:"id,attr"`

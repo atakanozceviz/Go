@@ -73,21 +73,28 @@
         if (msg == "refresh") {
             getOnlineUsers()
         } else if (msg.room > 0) {
-
-            $('#' + msg.room + '').append($('<li>').text(msg.message));
+            $('#' + msg.room).append($('<li>').text(msg.message));
+        } else {
+            var parsed = JSON.parse(msg);
+            if (parsed.delete == "delete" && parsed.room > 0) {
+                console.log(parsed.room);
+                $('#' + parsed.room).remove();
+                $('#li' + parsed.room).remove();
+            }
         }
 
     });
 
     function getOnlineUsers() {
         $.ajax({
+            type: "POST",
             dataType: "json",
             url: "/whoisOnline",
             success: function (data) {
                 $.each(JSON.parse(data), function (i, item) {
                     if ($("#" + item.id + "").length == 0) {
                         var msg = '<div id="' + item.id + '" class="tab-pane fade"></div>';
-                        var btn = '<li><a data-toggle="pill" onclick = "changeroom(\'' + item.id + '\')" href="#' + item.id + '">' + item.email + '</a></li>';
+                        var btn = '<li id="li' + item.id + '"><a data-toggle="pill" onclick = "changeroom(\'' + item.id + '\')" href="#' + item.id + '">' + item.email + '</a></li>';
                         $(".tab-content").append(msg);
                         $(".nav-pills").append(btn);
                     }
